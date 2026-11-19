@@ -217,3 +217,19 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 /* 少选反馈：介于对与错之间 */
 .feedback.fb-partial{border-color:var(--warn)}
 .feedback.fb-partial .fb-title{color:var(--warn)}
+
+/* ===== 全局字号放大覆盖层（集中管理，便于再调） =====
+   核心阅读文字放大更多，辅助小字适度放大；仅覆盖 font-size，不动布局结构 */
+body{font-size:16px}
+.muted,.streak-badge,.icon-btn,.ghost-btn,.hero-detail,.pt-page,.q-type,.q-mastery,.feedback .fb-label,.stat-lbl,.qr-hint{font-size:14px}
+.brand-title,.hero-label,.fb-title,.modal-head h3,.done-panel .big{font-size:18px}
+.brand-sub,.sc-foot,.pt-cat,.q-stem+.q-meta,.fb-label,.stat-table th,.case-tag{font-size:13px}
+.side-home,.side-item,.hero-tips,.sec-card .sc-name,.cat-chip,.mode-btn,.feedback,.toast,.modal-tip,.qr-local,.case-head,.case-bg,.rule-tip,.stat-table th,.stat-table td{font-size:15px}
+.q-stem{font-size:19px}
+.opt,.blank-input{font-size:17px}
+.judge-btns .opt{font-size:18px}
+.btn{font-size:15px}
+.q-star,.tag-hot,.tag-zhenti{font-size:13px}
+.view-head h2{font-size:22px}
+.stat-num{font-size:29px}
+.opt .key{font-size:14px}
