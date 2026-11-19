@@ -195,6 +195,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .qr-body{text-align:center;padding:20px}
 .qr-wrap{display:flex;justify-content:center;padding:16px;background:#fff;border-radius:var(--r2);margin:4px auto 14px;width:max-content;max-width:100%}
 #qrcode{width:230px;height:230px}
+.qr-url{color:var(--teal);font-weight:700;font-size:14px;letter-spacing:.3px;margin:2px 0 0;user-select:text;-webkit-user-select:text}
 .qr-hint{color:var(--tx3);font-size:12px;line-height:1.6}
 .qr-local{width:230px;height:230px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--warn);font-size:13px;line-height:1.8;padding:16px}
 

@@ -555,20 +555,20 @@ function hardRefresh(){
 }
 
 // ===== 扫码在 iPad 打开 =====
+// 固定正式域名：无论从 pages.dev、备用域名还是本地预览打开，扫码都指向这里
+const QZ_OFFICIAL_URL = "https://jd.yiyoo.ccwu.cc";
 function openQR(){
   $("#qrModal").classList.remove("hidden");
-  const url = location.href.split("#")[0];
+  let url = QZ_OFFICIAL_URL;
+  // 若当前地址带 sharecode，则保留（兼容旧链接鉴权）
+  const sc = (location.href.match(/[?&]sharecode=([^&#]+)/)||[])[1];
+  if (sc) url += "?sharecode=" + encodeURIComponent(sc);
   const box = $("#qrcode");
   box.innerHTML = "";
-  if (!/^https?:/i.test(url)){
-    // 本地 file:// 打开时二维码无意义，给出提示
-    box.innerHTML = `<div class="qr-local">当前是本地预览模式，<br>请打开线上网址后再扫码。<br><span class="muted">（电脑浏览器地址栏以 https 开头时即可）</span></div>`;
-    return;
-  }
   try {
     new QRCode(box, { text:url, width:230, height:230, colorDark:"#0f1115", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.M });
   } catch(e){
-    box.innerHTML = `<div class="qr-local">二维码生成失败，请直接复制地址栏网址。</div>`;
+    box.innerHTML = `<div class="qr-local">二维码生成失败，请直接复制网址：<br>${QZ_OFFICIAL_URL}</div>`;
   }
 }
 function closeQR(){ $("#qrModal").classList.add("hidden"); }
