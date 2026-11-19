@@ -731,6 +731,7 @@ function showFeedback(q, correct, partial){
     <div class="fb-label">教材依据与解析</div><div>${esc(q.explain)}</div>
     <div class="fb-source">出处：${esc(q.source)}</div>
     ${showCase}
+    <div class="fb-feedback-row"><button class="fb-inline-btn ${correct?"":"fb-inline-hot"}" onclick="openFeedback()">✎ ${correct?"发现题目/答案有误？点此纠错":"答错了？若怀疑题目或答案有误，点此纠错"}</button></div>
   </div>`;
   QUIZ.answered=true; renderFooter();
 }
@@ -929,6 +930,14 @@ $("#btnRefresh").addEventListener("click", hardRefresh);
 $("#btnQR").addEventListener("click", openQR);
 $("#btnExport").addEventListener("click", ()=>openBackup("export"));
 $("#btnImport").addEventListener("click", ()=>openBackup("import"));
+// 更多菜单：展开/收起，点外部或选中项后自动关闭
+(function bindMoreMenu(){
+  const btn = $("#btnMore"), menu = $("#moreMenu");
+  if (!btn || !menu) return;
+  btn.addEventListener("click", function(e){ e.stopPropagation(); menu.classList.toggle("hidden"); });
+  document.addEventListener("click", function(e){ if (!menu.contains(e.target) && e.target!==btn) menu.classList.add("hidden"); });
+  menu.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>menu.classList.add("hidden")));
+})();
 $("#btnToggleRemembered").addEventListener("click", function(){
   CUR.filtered = !CUR.filtered;
   this.textContent = CUR.filtered ? "显示全部" : "只看未记住";

@@ -7,21 +7,21 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>一建机电 · 无死角刷题系统</title>
-<link rel="icon" type="image/png" href="favicon-192.png?v=20261119y">
-<link rel="shortcut icon" href="favicon.ico?v=20261119y">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261119y">
+<link rel="icon" type="image/png" href="favicon-192.png?v=20261119z">
+<link rel="shortcut icon" href="favicon.ico?v=20261119z">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261119z">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="一建机电刷题">
 <meta name="theme-color" content="#0f1115">
-<link rel="manifest" href="manifest.webmanifest?v=20261119y">
-<link rel="stylesheet" href="style.css?v=20261119y">
+<link rel="manifest" href="manifest.webmanifest?v=20261119z">
+<link rel="stylesheet" href="style.css?v=20261119z">
 </head>
 <body>
 <div id="app">
   <header class="topbar">
     <div class="brand">
-      <img class="brand-mark" src="icon.svg?v=20261119y" alt="一建机电刷题">
+      <img class="brand-mark" src="icon.svg?v=20261119z" alt="一建机电刷题">
       <div>
         <div class="brand-title">一建机电 · 无死角刷题系统</div>
         <div class="brand-sub">官方教材为据 · 真题题型（单选/多选/案例）· 逐节吃透 · 反复刷至烂熟</div>
@@ -32,11 +32,16 @@
         <span class="flame">▲</span><span id="studyDays">0</span> 天
       </div>
       <span class="sync-dot" id="syncDot" title="云端同步状态">☁ 同步中</span>
-      <button class="icon-btn refresh-btn" id="btnRefresh" title="强制拉取最新版本">⟳ 刷新</button>
-      <button class="icon-btn" id="btnQR" title="扫码在 iPad 打开">📱 扫码</button>
-      <button class="icon-btn" id="btnExport" title="导出进度备份">导出进度</button>
-      <button class="icon-btn" id="btnImport" title="导入进度备份">导入进度</button>
-      <button class="icon-btn" id="btnReset" title="清除所有进度">重置进度</button>
+      <button class="tb-btn tb-refresh" id="btnRefresh" title="强制拉取最新版本">⟳<span>刷新</span></button>
+      <button class="tb-btn" id="btnQR" title="扫码在 iPad 打开">▣<span>扫码</span></button>
+      <div class="more-wrap">
+        <button class="tb-btn" id="btnMore" title="更多操作">⋯<span>更多</span></button>
+        <div class="more-menu hidden" id="moreMenu">
+          <button id="btnExport">⇩ 导出进度备份</button>
+          <button id="btnImport">⇧ 导入进度备份</button>
+          <button id="btnReset" class="danger">✕ 重置进度</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -163,21 +168,21 @@
   </div>
 </div>
 
-<script src="qrcode.min.js?v=20261119y"></script>
-<script src="data/catalog.js?v=20261119y"></script>
-<script src="data/s1_1a.js?v=20261119y"></script>
-<script src="data/s1_1b.js?v=20261119y"></script>
-<script src="data/s1_1c.js?v=20261119y"></script>
-<script src="data/s1_1d.js?v=20261119y"></script>
-<script src="data/s1_1_cases.js?v=20261119y"></script>
-<script src="data/s1_1.js?v=20261119y"></script>
-<script src="data/s1_2a.js?v=20261119y"></script>
-<script src="data/s1_2b.js?v=20261119y"></script>
-<script src="data/s1_2c.js?v=20261119y"></script>
-<script src="data/s1_2d.js?v=20261119y"></script>
-<script src="data/s1_2_cases.js?v=20261119y"></script>
-<script src="data/s1_2.js?v=20261119y"></script>
-<script src="data/stars.js?v=20261119y"></script>
-<script src="app.js?v=20261119y"></script>
+<script src="qrcode.min.js?v=20261119z"></script>
+<script src="data/catalog.js?v=20261119z"></script>
+<script src="data/s1_1a.js?v=20261119z"></script>
+<script src="data/s1_1b.js?v=20261119z"></script>
+<script src="data/s1_1c.js?v=20261119z"></script>
+<script src="data/s1_1d.js?v=20261119z"></script>
+<script src="data/s1_1_cases.js?v=20261119z"></script>
+<script src="data/s1_1.js?v=20261119z"></script>
+<script src="data/s1_2a.js?v=20261119z"></script>
+<script src="data/s1_2b.js?v=20261119z"></script>
+<script src="data/s1_2c.js?v=20261119z"></script>
+<script src="data/s1_2d.js?v=20261119z"></script>
+<script src="data/s1_2_cases.js?v=20261119z"></script>
+<script src="data/s1_2.js?v=20261119z"></script>
+<script src="data/stars.js?v=20261119z"></script>
+<script src="app.js?v=20261119z"></script>
 </body>
 </html>
