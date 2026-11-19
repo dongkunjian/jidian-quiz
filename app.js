@@ -171,17 +171,29 @@ function levelOf(st) {
   if (st.streak > 0 || st.right > 0) return "learning";
   return "new";
 }
+function sectionIdByData(dataKey){
+  for (const part of window.CATALOG.parts)
+    for (const ch of part.chapters)
+      for (const sec of ch.sections)
+        if (sec.data === dataKey) return sec.id;
+  return null;
+}
 function sectionStats(sectionId) {
   // 兼容两种标识：data key（S1_1）与节 id（1.1）
   let bank = BANK[sectionId];
+  let sid = sectionId;                    // 进度统一按「节 id」存储（1.1::a01）
   if (!bank){
     const info = sectionById(sectionId);
     if (info && info.sec.data) bank = BANK[info.sec.data];
+  } else if (!sectionById(sectionId)){
+    // 传入的是 data key（如 S1_1）：反查真实节 id，否则查不到进度
+    const real = sectionIdByData(sectionId);
+    if (real) sid = real;
   }
   if (!bank) return { total:0, mastered:0, learning:0, pct:0 };
   let mastered=0, learning=0;
   flatQuestions(bank).forEach(q => {
-    const lv = levelOf(qState(sectionId, q.id));
+    const lv = levelOf(qState(sid, q.id));
     if (lv==="mastered") mastered++;
     else if (lv==="learning") learning++;
   });
