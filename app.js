@@ -49,6 +49,32 @@ function flatQuestions(bank){
   return out;
 }
 
+// ===== 答过的题再次出现时打乱选项顺序（防止凭位置记忆作答）=====
+// 只打乱有 options 的选择题（single/multi，含案例小问）；判断题/填空不改。
+// 关键：Fisher-Yates 打乱后，原选项下标变了，answer（单选数字 / 多选数组）必须同步重映射，
+// 否则判分与"正确答案"显示会错位。生成新对象，不修改 _flatCache 里的原始数据。
+function shuffledQuestion(q, sectionId){
+  if (!q.options || !Array.isArray(q.options) || (q.type!=="single" && q.type!=="multi")) return q;
+  const st = qState(sectionId, q.id);
+  if (!st.right && !st.wrong) return q;              // 没答过：保持教材原序
+  const n = q.options.length;
+  if (n < 2) return q;
+  // newIndex -> oldIndex：perm[i] 表示打乱后第 i 个位置原本是哪个选项
+  const perm = q.options.map((_,i)=>i);
+  for (let i=n-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const t=perm[i]; perm[i]=perm[j]; perm[j]=t;
+  }
+  // 若恰好没变（概率 1/n!），交换首两项确保确实打乱了
+  if (perm.every((v,i)=>v===i)){ const t=perm[0]; perm[0]=perm[1]; perm[1]=t; }
+  const newOptions = perm.map(old => q.options[old]);
+  const old2new = {}; perm.forEach((old,ni)=>{ old2new[old]=ni; });
+  const newAnswer = Array.isArray(q.answer)
+    ? q.answer.map(a=>old2new[a]).sort((a,b)=>a-b)
+    : old2new[q.answer];
+  return Object.assign({}, q, { options:newOptions, answer:newAnswer, _shuffled:true });
+}
+
 // ===== 进度存储（localStorage 降级到内存） =====
 let memoryStore = {};
 function loadProgress() {
@@ -390,6 +416,8 @@ function startQuiz(mode){
   else if (mode==="new") qs = qs.filter(q=>lv(q)!=="mastered");
   else if (mode==="random") qs.sort(()=>Math.random()-0.5);
 
+  // 答过的题：打乱选项顺序并同步重映射 answer，防止凭位置记忆作答（生成副本，不动原始题库缓存）
+  qs = qs.map(q => shuffledQuestion(q, CUR.sectionId));
   QUIZ = { list:qs, idx:0, answered:false, selected:null, sectionId:CUR.sectionId };
   if (!qs.length){ toast("该模式下没有题目"); }
   renderQuestion();
