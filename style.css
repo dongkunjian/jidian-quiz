@@ -16,7 +16,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 /* topbar */
 .topbar{height:62px;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:10}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--purple));display:grid;place-items:center;font-weight:700;font-size:18px;color:#fff}
+.brand-mark{width:36px;height:36px;border-radius:10px;object-fit:cover;flex:0 0 36px}
 .brand-title{font-size:15px;font-weight:600;letter-spacing:.3px}
 .brand-sub{font-size:11px;color:var(--tx3);margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:14px}

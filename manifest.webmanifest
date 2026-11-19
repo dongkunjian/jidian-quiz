@@ -1,0 +1,17 @@
+{
+  "name": "一建机电 · 无死角刷题系统",
+  "short_name": "一建机电刷题",
+  "description": "2027一建机电备考：官方教材为据，逐节刷题至烂熟",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
