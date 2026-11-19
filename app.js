@@ -137,6 +137,7 @@ async function pullProgress(){
         if (CUR.view === "home") renderHome();
         else if (CUR.view === "stats") renderStats();
         else if (CUR.view === "points") renderPoints();
+        else if (CUR.view === "quiz") renderNavTable();
       } catch(e){}
       pushProgress(true);
     } else {
@@ -400,7 +401,7 @@ function renderQuestion(){
   if (!total){
     card.innerHTML = `<div class="done-panel"><div class="big">该模式下暂无题目</div><div class="sub">换一个模式试试，或先去做知识点卡片</div></div>`;
     $("#qbarFill").style.width="0%"; $("#qCounter").textContent="";
-    $("#quizFooter").innerHTML=""; return;
+    $("#quizFooter").innerHTML=""; renderNavTable(); return;
   }
   if (QUIZ.idx >= total){
     const st = sectionStats(CUR.sectionId);
@@ -412,7 +413,7 @@ function renderQuestion(){
     </div>`;
     $("#qbarFill").style.width="100%";
     $("#qCounter").textContent=`${total}/${total}`;
-    $("#quizFooter").innerHTML=""; return;
+    $("#quizFooter").innerHTML=""; renderNavTable(); return;
   }
 
   const q = QUIZ.list[QUIZ.idx];
@@ -469,6 +470,7 @@ function renderQuestion(){
 
   QUIZ.answered=false; QUIZ.selected=null; QUIZ.awaitSelf=false;
   renderFooter();
+  renderNavTable();
 }
 
 function pick(i){
@@ -568,6 +570,7 @@ function applyResult(q, correct){
   if (correct){ st.right++; st.streak++; }
   else { st.wrong++; st.streak=0; }
   saveProgress();
+  renderNavTable(); // 立即刷新该题号的格子颜色
 }
 
 function showFeedback(q, correct, partial){
@@ -602,6 +605,57 @@ function nextQuestion(){
   QUIZ.idx++;
   renderQuestion();
   if (QUIZ.idx % 10 === 0) renderSidebar();
+}
+
+// ===== 本节答题总表：题号格子墙（按“顺序练”全集序号排列，颜色标注状态）=====
+// 状态完全由已有进度推导，不新增存储字段：
+//   未做=new（无任何作答） / 做错=wrong（最后一次答错：streak=0 且 wrong>0）
+//   做对·巩固中=learning（最近答对但未烂熟：streak 1~2） / 已烂熟=mastered（streak>=3）
+function navStatus(sectionId, qid){
+  const st = qState(sectionId, qid);
+  if (!st.right && !st.wrong) return "new";
+  if (st.streak >= MASTER_STREAK) return "mastered";
+  if (st.streak > 0) return "learning";
+  if (st.wrong > 0) return "wrong";
+  return "learning"; // 兜底：只有 right 但 streak=0 的异常记录
+}
+function renderNavTable(){
+  const panel = $("#navPanel");
+  if (!panel || !CUR.sectionId) return;
+  const bank = BANK[sectionById(CUR.sectionId).sec.data];
+  if (!bank){ panel.classList.add("hidden"); return; }
+  const all = flatQuestions(bank);                  // 固定用全集顺序，与当前刷题模式无关
+  const curQ = QUIZ.list[QUIZ.idx];
+  const counts = { new:0, wrong:0, learning:0, mastered:0 };
+  const cells = all.map((q,i)=>{
+    const s = navStatus(CUR.sectionId, q.id);
+    counts[s]++;
+    const isCur = curQ && curQ.id === q.id;
+    const label = { new:"未做", wrong:"做错", learning:"做对·巩固中", mastered:"已烂熟" }[s];
+    return `<div class="nav-cell nc-${s}${isCur?" current":""}" onclick="jumpToQuestion(${i+1})" title="第${i+1}题 · ${label}">${i+1}</div>`;
+  }).join("");
+  $("#navCount").textContent = `共 ${all.length} 题 · 点击题号跳转`;
+  $("#legendNew").textContent = counts.new;
+  $("#legendWrong").textContent = counts.wrong;
+  $("#legendLearning").textContent = counts.learning;
+  $("#legendMastered").textContent = counts.mastered;
+  $("#navGrid").innerHTML = cells;
+  panel.classList.remove("hidden");
+}
+function toggleNavTable(){
+  const hidden = $("#navGrid").classList.toggle("hidden");
+  $("#navToggle").textContent = hidden ? "展开" : "收起";
+}
+function jumpToQuestion(n){
+  const bank = BANK[sectionById(CUR.sectionId).sec.data];
+  const all = flatQuestions(bank);
+  if (n < 1 || n > all.length) return;
+  // 非顺序模式或列表被筛选/重排过：切回顺序练，保证题号与序号一一对应
+  if (CUR.mode !== "order" || QUIZ.list.length !== all.length) startQuiz("order");
+  QUIZ.idx = n - 1;
+  renderQuestion();
+  try { $("#quizCard").scrollIntoView({ behavior:"smooth", block:"start" }); }
+  catch(e){ try { $("#quizCard").scrollIntoView(); } catch(_){} }
 }
 
 // ===== 统计 =====

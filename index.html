@@ -7,21 +7,21 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>一建机电 · 无死角刷题系统</title>
-<link rel="icon" type="image/png" href="favicon-192.png?v=20261119r">
-<link rel="shortcut icon" href="favicon.ico?v=20261119r">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261119r">
+<link rel="icon" type="image/png" href="favicon-192.png?v=20261119s">
+<link rel="shortcut icon" href="favicon.ico?v=20261119s">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261119s">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="一建机电刷题">
 <meta name="theme-color" content="#0f1115">
-<link rel="manifest" href="manifest.webmanifest?v=20261119r">
-<link rel="stylesheet" href="style.css?v=20261119r">
+<link rel="manifest" href="manifest.webmanifest?v=20261119s">
+<link rel="stylesheet" href="style.css?v=20261119s">
 </head>
 <body>
 <div id="app">
   <header class="topbar">
     <div class="brand">
-      <img class="brand-mark" src="icon.svg?v=20261119r" alt="一建机电刷题">
+      <img class="brand-mark" src="icon.svg?v=20261119s" alt="一建机电刷题">
       <div>
         <div class="brand-title">一建机电 · 无死角刷题系统</div>
         <div class="brand-sub">官方教材为据 · 真题题型（单选/多选/案例）· 逐节吃透 · 反复刷至烂熟</div>
@@ -92,6 +92,21 @@
           <div id="quizCard" class="quiz-card"></div>
           <div class="quiz-footer" id="quizFooter"></div>
         </div>
+
+        <!-- 本节答题总表：全部题目按序号排列，颜色标注做对/做错/未做，点击可跳转 -->
+        <div class="nav-panel hidden" id="navPanel">
+          <div class="nav-head">
+            <div class="nav-title">本节答题总表 <span class="muted" id="navCount"></span></div>
+            <button class="ghost-btn" id="navToggle" onclick="toggleNavTable()">收起</button>
+          </div>
+          <div class="nav-legend">
+            <span class="legend-item"><i class="swatch sw-new"></i>未做 <b id="legendNew">0</b></span>
+            <span class="legend-item"><i class="swatch sw-wrong"></i>做错 <b id="legendWrong">0</b></span>
+            <span class="legend-item"><i class="swatch sw-learning"></i>做对·巩固中 <b id="legendLearning">0</b></span>
+            <span class="legend-item"><i class="swatch sw-mastered"></i>已烂熟 <b id="legendMastered">0</b></span>
+          </div>
+          <div class="nav-grid" id="navGrid"></div>
+        </div>
       </section>
 
       <!-- 统计视图 -->
@@ -131,21 +146,21 @@
   </div>
 </div>
 
-<script src="qrcode.min.js?v=20261119r"></script>
-<script src="data/catalog.js?v=20261119r"></script>
-<script src="data/s1_1a.js?v=20261119r"></script>
-<script src="data/s1_1b.js?v=20261119r"></script>
-<script src="data/s1_1c.js?v=20261119r"></script>
-<script src="data/s1_1d.js?v=20261119r"></script>
-<script src="data/s1_1_cases.js?v=20261119r"></script>
-<script src="data/s1_1.js?v=20261119r"></script>
-<script src="data/s1_2a.js?v=20261119r"></script>
-<script src="data/s1_2b.js?v=20261119r"></script>
-<script src="data/s1_2c.js?v=20261119r"></script>
-<script src="data/s1_2d.js?v=20261119r"></script>
-<script src="data/s1_2_cases.js?v=20261119r"></script>
-<script src="data/s1_2.js?v=20261119r"></script>
-<script src="data/stars.js?v=20261119r"></script>
-<script src="app.js?v=20261119r"></script>
+<script src="qrcode.min.js?v=20261119s"></script>
+<script src="data/catalog.js?v=20261119s"></script>
+<script src="data/s1_1a.js?v=20261119s"></script>
+<script src="data/s1_1b.js?v=20261119s"></script>
+<script src="data/s1_1c.js?v=20261119s"></script>
+<script src="data/s1_1d.js?v=20261119s"></script>
+<script src="data/s1_1_cases.js?v=20261119s"></script>
+<script src="data/s1_1.js?v=20261119s"></script>
+<script src="data/s1_2a.js?v=20261119s"></script>
+<script src="data/s1_2b.js?v=20261119s"></script>
+<script src="data/s1_2c.js?v=20261119s"></script>
+<script src="data/s1_2d.js?v=20261119s"></script>
+<script src="data/s1_2_cases.js?v=20261119s"></script>
+<script src="data/s1_2.js?v=20261119s"></script>
+<script src="data/stars.js?v=20261119s"></script>
+<script src="app.js?v=20261119s"></script>
 </body>
 </html>
