@@ -621,9 +621,18 @@ function showFeedback(q, correct, partial){
   QUIZ.answered=true; renderFooter();
 }
 
+// 把题干卡上边缘滚到 sticky 顶栏正下方（scroll-margin-top 在 CSS 中设为略大于顶栏高度）
+function scrollCardIntoView(){
+  try {
+    const card = $("#quizCard");
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior:"smooth", block:"start" });
+  } catch(e){}
+}
+
 function nextQuestion(){
   QUIZ.idx++;
   renderQuestion();
+  scrollCardIntoView();
   if (QUIZ.idx % 10 === 0) renderSidebar();
 }
 
@@ -674,8 +683,7 @@ function jumpToQuestion(n){
   if (CUR.mode !== "order" || QUIZ.list.length !== all.length) startQuiz("order");
   QUIZ.idx = n - 1;
   renderQuestion();
-  try { $("#quizCard").scrollIntoView({ behavior:"smooth", block:"start" }); }
-  catch(e){ try { $("#quizCard").scrollIntoView(); } catch(_){} }
+  scrollCardIntoView();
 }
 
 // ===== 统计 =====

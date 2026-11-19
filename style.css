@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .quiz-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px}
 .qbar{flex:1;height:6px;background:var(--bg4);border-radius:4px;overflow:hidden}
 .qbar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--teal));transition:.3s}
-.quiz-card{min-height:220px}
+.quiz-card{min-height:220px;scroll-margin-top:72px}
 .q-meta{display:flex;gap:8px;align-items:center;margin-bottom:14px}
 .q-type{font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 9px;color:var(--tx2)}
 .q-mastery{font-size:11px;border-radius:5px;padding:2px 9px}
