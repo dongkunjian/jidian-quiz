@@ -62,8 +62,88 @@ function loadProgress() {
 function saveProgress() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(PROGRESS)); }
   catch (e) { memoryStore = PROGRESS; }
+  // 每次保存都安排一次云端推送（防抖 1.2s，答题连点时不会狂发请求）
+  if (syncReady) pushProgress(false);
 }
 let PROGRESS = loadProgress();
+
+// ===== 云端同步（单用户 · 同域 /api/sync）=====
+// 目的：进度不再只存在浏览器 localStorage（按域名隔离、换域名/换设备就丢）。
+// 特性：完全旁路——云端不可用时静默降级为本地记录，绝不影响刷题。
+const SYNC_URL = "api/sync?k=jidian2027";
+let syncTimer = null, syncBusy = false, syncReady = false;
+
+function setSyncState(state){ // "ok" | "busy" | "off"
+  const el = $("#syncDot");
+  if (!el) return;
+  if (state === "ok"){ el.textContent = "☁ 已同步"; el.className = "sync-dot on"; el.title = "进度已保存到云端，换设备/换域名都不会丢"; }
+  else if (state === "busy"){ el.textContent = "☁ 同步中"; el.className = "sync-dot"; el.title = "正在与云端同步"; }
+  else { el.textContent = "☁ 仅本地"; el.className = "sync-dot off"; el.title = "云端暂不可用，记录仍保存在本机，不影响刷题"; }
+}
+
+// 合并两份进度：计数取大（单调递增，安全）、卡片取并集、连续天数取大、日期取晚
+function mergeProgress(a, b){
+  if (!b || typeof b !== "object") return a;
+  const ae = a.epoch || 0, be = b.epoch || 0;
+  if (ae !== be) return ae > be ? a : b;   // 重置等大变更：整份胜出
+  const out = { q:{}, p:{}, days:a.days, lastDay:a.lastDay, epoch:ae };
+  const keys = new Set([...Object.keys(a.q||{}), ...Object.keys(b.q||{})]);
+  keys.forEach(k=>{
+    const x = (a.q||{})[k], y = (b.q||{})[k];
+    if (!x) { out.q[k] = y; return; }
+    if (!y) { out.q[k] = x; return; }
+    out.q[k] = { right:Math.max(x.right||0,y.right||0), wrong:Math.max(x.wrong||0,y.wrong||0), streak:Math.max(x.streak||0,y.streak||0) };
+  });
+  out.p = Object.assign({}, a.p||{}, b.p||{});
+  const da = a.days||{}, db = b.days||{};
+  out.days = ((da.streak||0) >= (db.streak||0)) ? da : db;
+  out.lastDay = (a.lastDay||"") >= (b.lastDay||"") ? (a.lastDay||"") : (b.lastDay||"");
+  return out;
+}
+
+function pushProgress(immediate){
+  clearTimeout(syncTimer);
+  const run = async ()=>{
+    if (syncBusy) return;
+    syncBusy = true;
+    try {
+      const r = await fetch(SYNC_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(PROGRESS), cache:"no-store" });
+      const j = await r.json();
+      if (j && j.ok) setSyncState("ok"); else setSyncState("off");
+    } catch(e){ setSyncState("off"); }
+    finally { syncBusy = false; }
+  };
+  if (immediate) run(); else syncTimer = setTimeout(run, 1200);
+}
+
+async function pullProgress(){
+  setSyncState("busy");
+  try {
+    const r = await fetch(SYNC_URL, { cache:"no-store" });
+    const j = await r.json();
+    if (!j || !j.ok){ setSyncState("off"); syncReady = true; return; }
+    const remote = j.data;
+    syncReady = true;
+    if (!remote){ setSyncState("ok"); pushProgress(true); return; }   // 云端为空：把本地推上去
+    const merged = mergeProgress(PROGRESS, remote);
+    const changed = JSON.stringify(merged) !== JSON.stringify(PROGRESS);
+    PROGRESS = merged;
+    if (changed){
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(PROGRESS)); } catch(e){}
+      // 刷新界面（答题中不打断当前题）
+      try {
+        renderSidebar();
+        $("#studyDays").textContent = studyDays();
+        if (CUR.view === "home") renderHome();
+        else if (CUR.view === "stats") renderStats();
+        else if (CUR.view === "points") renderPoints();
+      } catch(e){}
+      pushProgress(true);
+    } else {
+      setSyncState("ok");
+    }
+  } catch(e){ setSyncState("off"); syncReady = true; }
+}
 
 function touchDay() {
   const d = new Date();
@@ -535,9 +615,11 @@ function renderStats(){
 
 // ===== 重置 =====
 function resetProgress(){
-  if (!confirm("确定清除全部刷题进度和掌握度吗？此操作不可恢复。")) return;
-  PROGRESS = { q:{}, p:{}, days:[], lastDay:"" };
+  if (!confirm("确定清除全部刷题进度和掌握度吗？此操作不可恢复（云端记录也会一并清除）。")) return;
+  // epoch 取当前时间戳：云端合并时以 epoch 大的一方为准，确保"清空"能覆盖旧云记录
+  PROGRESS = { q:{}, p:{}, days:[], lastDay:"", epoch: Date.now() };
   saveProgress();
+  pushProgress(true);
   toast("进度已清空");
   goHome();
 }
@@ -684,3 +766,7 @@ touchDay();
 renderSidebar();
 renderHome();
 showView("home");
+// 本地渲染完成后，异步拉取云端进度并合并（不阻塞首屏；失败静默）
+// 注意：syncReady 在 pullProgress 内部合并完成后才置 true，
+// 避免"拉取尚未完成就用本地空数据覆盖云端"。
+pullProgress();

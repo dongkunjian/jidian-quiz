@@ -21,6 +21,9 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .brand-sub{font-size:11px;color:var(--tx3);margin-top:1px}
 .topbar-right{display:flex;align-items:center;gap:14px}
 .streak-badge{background:var(--bg3);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--warn)}
+.sync-dot{font-size:12px;color:var(--tx3);white-space:nowrap;cursor:help;padding:4px 8px;border-radius:20px;transition:.2s}
+.sync-dot.on{color:var(--ok)}
+.sync-dot.off{color:var(--warn)}
 .streak-badge .flame{font-size:10px;margin-right:4px}
 .icon-btn,.ghost-btn{background:transparent;border:1px solid var(--line2);color:var(--tx2);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;transition:.15s}
 .icon-btn:hover,.ghost-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--bg3)}
