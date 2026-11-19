@@ -511,8 +511,27 @@ function renderFooter(){
   }
 }
 
+// ===== 提交后把"下一题"按钮锚定回"提交答案"的屏幕位置 =====
+// 反馈内容插入后会把 footer 撑下去。提交前先记住 footer 的视口 Y，
+// 反馈渲染完成后把页面向下滚动同样距离，按钮即回到原处，方便不挪手连续作答。
+let _footerAnchorY = null;
+function captureFooterAnchor(){
+  const f = $("#quizFooter");
+  _footerAnchorY = f && f.getBoundingClientRect ? f.getBoundingClientRect().top : null;
+}
+function restoreFooterAnchor(){
+  if (_footerAnchorY == null) return;
+  const f = $("#quizFooter");
+  if (f && f.getBoundingClientRect){
+    const dy = f.getBoundingClientRect().top - _footerAnchorY; // 按钮被撑下的距离
+    if (Math.abs(dy) > 1){ try { window.scrollBy(0, dy); } catch(e){} }
+  }
+  _footerAnchorY = null;
+}
+
 function submitAnswer(){
   if (QUIZ.answered) return;
+  captureFooterAnchor();
   const q = QUIZ.list[QUIZ.idx];
   let correct=false, partial=false;
   if (q.type==="single"){
@@ -530,6 +549,7 @@ function submitAnswer(){
   // 少选在真题中得部分分，但未达"吃透"，仍按一次未完全答对计入，打断连对
   applyResult(q, correct);
   showFeedback(q, correct, partial);
+  restoreFooterAnchor();
 }
 
 function revealAnswer(){
