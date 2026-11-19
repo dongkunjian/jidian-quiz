@@ -7,9 +7,14 @@
   --warn:#e0a63a; --warnbg:#3a2d15;
   --purple:#a77bff; --teal:#2fc9b6;
   --r:12px; --r2:9px;
-  /* PWA/刘海屏安全区：状态栏高度，顶栏据此下移，避免被时间/电池遮挡 */
+  /* PWA/刘海屏安全区：顶栏据此下移，避免被时间/电池状态栏压住 */
   --safe-top:env(safe-area-inset-top, 0px);
   --top-h:calc(62px + var(--safe-top));
+}
+/* iPad/手机等触控设备（添加到主屏幕的 PWA）：env() 在某些 iPadOS 返回偏小，
+   额外下移半个 logo 高（20px），确保 logo 与标题完全露出；桌面鼠标设备不受影响 */
+@media (pointer:coarse){
+  :root{ --safe-top:calc(env(safe-area-inset-top, 0px) + 20px); }
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
