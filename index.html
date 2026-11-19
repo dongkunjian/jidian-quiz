@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>一建机电 · 无死角刷题系统</title>
+<link rel="stylesheet" href="style.css?v=20261119i">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">机</span>
+      <div>
+        <div class="brand-title">一建机电 · 无死角刷题系统</div>
+        <div class="brand-sub">官方教材为据 · 真题题型（单选/多选/案例）· 逐节吃透 · 反复刷至烂熟</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="streak-badge" id="streakBadge" title="连续学习天数">
+        <span class="flame">▲</span><span id="studyDays">0</span> 天
+      </div>
+      <button class="icon-btn refresh-btn" id="btnRefresh" title="强制拉取最新版本">⟳ 刷新</button>
+      <button class="icon-btn" id="btnQR" title="扫码在 iPad 打开">📱 扫码</button>
+      <button class="icon-btn" id="btnExport" title="导出进度备份">导出进度</button>
+      <button class="icon-btn" id="btnImport" title="导入进度备份">导入进度</button>
+      <button class="icon-btn" id="btnReset" title="清除所有进度">重置进度</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <nav class="crumbs" id="crumbs"></nav>
+
+      <!-- 概览视图 -->
+      <section class="view" id="viewHome">
+        <div class="hero">
+          <div class="hero-stat">
+            <div class="ring" id="homeRing"><span id="homePct">0%</span></div>
+            <div>
+              <div class="hero-label">全书掌握度</div>
+              <div class="hero-detail" id="homeDetail">0 / 0 题已烂熟</div>
+            </div>
+          </div>
+          <div class="hero-tips">
+            <div class="tip-line"><b>真题题型</b>：单选4选1 / 多选5选2~4 / 实务案例（背景+选择小问）</div>
+            <div class="tip-line"><b>规则</b>：每题连续答对 3 次 = 烂熟；多选须全部选对才算吃透</div>
+            <div class="tip-line"><b>弱项优先</b>：生疏题自动排到前面；<b>依据</b>：每题附教材页码</div>
+          </div>
+        </div>
+        <div class="section-grid" id="sectionGrid"></div>
+      </section>
+
+      <!-- 知识点视图 -->
+      <section class="view hidden" id="viewPoints">
+        <div class="view-head">
+          <h2 id="pointsTitle">知识点卡片</h2>
+          <div class="view-actions">
+            <span class="muted" id="pointsProgress"></span>
+            <button class="ghost-btn" id="btnToggleRemembered">只看未记住</button>
+          </div>
+        </div>
+        <div class="point-cats" id="pointCats"></div>
+        <div class="point-list" id="pointList"></div>
+      </section>
+
+      <!-- 刷题视图 -->
+      <section class="view hidden" id="viewQuiz">
+        <div class="view-head">
+          <h2 id="quizTitle">按节刷题</h2>
+          <div class="modes" id="modeBar"></div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-progress">
+            <div class="qbar"><div class="qbar-fill" id="qbarFill"></div></div>
+            <span id="qCounter" class="muted"></span>
+          </div>
+          <div id="quizCard" class="quiz-card"></div>
+          <div class="quiz-footer" id="quizFooter"></div>
+        </div>
+      </section>
+
+      <!-- 统计视图 -->
+      <section class="view hidden" id="viewStats">
+        <div class="view-head"><h2>学习统计</h2></div>
+        <div id="statsBody"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- 进度备份弹窗 -->
+<div class="modal-mask hidden" id="backupModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="backupTitle">进度备份</h3><button class="modal-x" onclick="closeBackup()">×</button></div>
+    <div class="modal-body">
+      <p class="modal-tip" id="backupTip"></p>
+      <textarea id="backupText" class="backup-text" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+    <div class="modal-foot" id="backupFoot"></div>
+  </div>
+</div>
+
+<!-- 扫码弹窗 -->
+<div class="modal-mask hidden" id="qrModal">
+  <div class="modal-box qr-box">
+    <div class="modal-head"><h3>扫码在 iPad 打开</h3><button class="modal-x" onclick="closeQR()">×</button></div>
+    <div class="modal-body qr-body">
+      <p class="modal-tip">用 iPad 相机或浏览器扫下方二维码，即可打开本刷题系统。</p>
+      <div class="qr-wrap"><div id="qrcode"></div></div>
+      <p class="qr-hint">打开后建议：Safari「分享」→「添加到主屏幕」，下次一键进入</p>
+    </div>
+  </div>
+</div>
+
+<script src="qrcode.min.js?v=20261119i"></script>
+<script src="data/catalog.js?v=20261119i"></script>
+<script src="data/s1_1a.js?v=20261119i"></script>
+<script src="data/s1_1b.js?v=20261119i"></script>
+<script src="data/s1_1c.js?v=20261119i"></script>
+<script src="data/s1_1d.js?v=20261119i"></script>
+<script src="data/s1_1_cases.js?v=20261119i"></script>
+<script src="data/s1_1.js?v=20261119i"></script>
+<script src="data/s1_2a.js?v=20261119i"></script>
+<script src="data/s1_2b.js?v=20261119i"></script>
+<script src="data/s1_2c.js?v=20261119i"></script>
+<script src="data/s1_2d.js?v=20261119i"></script>
+<script src="data/s1_2_cases.js?v=20261119i"></script>
+<script src="data/s1_2.js?v=20261119i"></script>
+<script src="data/stars.js?v=20261119i"></script>
+<script src="app.js?v=20261119i"></script>
+</body>
+</html>
