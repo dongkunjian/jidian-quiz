@@ -162,6 +162,11 @@ function studyDays() { return (PROGRESS.days && PROGRESS.days.streak) || 0; }
 
 // ===== 题目状态 =====
 function qState(sectionId, qid) {
+  // 只读：不存在时返回空状态，不写入 PROGRESS（避免统计时给每道题建空记录、污染同步数据）
+  return PROGRESS.q[sectionId + "::" + qid] || { right:0, wrong:0, streak:0 };
+}
+function qStateWritable(sectionId, qid) {
+  // 答题时用：确保记录已创建并可修改
   const k = sectionId + "::" + qid;
   if (!PROGRESS.q[k]) PROGRESS.q[k] = { right:0, wrong:0, streak:0 };
   return PROGRESS.q[k];
@@ -559,7 +564,7 @@ function selfJudge(correct){
 }
 
 function applyResult(q, correct){
-  const st = qState(CUR.sectionId, q.id);
+  const st = qStateWritable(CUR.sectionId, q.id);
   if (correct){ st.right++; st.streak++; }
   else { st.wrong++; st.streak=0; }
   saveProgress();
