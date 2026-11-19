@@ -39,24 +39,8 @@
 
   <!-- JD 字母 -->
   <g filter="url(#shadow)">
-    <text x="96" y="112" text-anchor="middle" dominant-baseline="central"
-          font-family="Arial Black, Arial, sans-serif" font-size="86" font-weight="900"
+    <text x="96" y="99" text-anchor="middle" dominant-baseline="central"
+          font-family="Arial Black, Arial, sans-serif" font-size="96" font-weight="900"
           letter-spacing="-4" fill="#ffffff">JD</text>
-  </g>
-
-  <!-- 齿轮细节：置于字母下方，象征机电 -->
-  <g transform="translate(96,158)" fill="#ffffff" fill-opacity="0.92">
-    <g id="t">
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(45)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(90)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(135)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(180)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(225)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(270)"/>
-      <rect x="-2.4" y="-13" width="4.8" height="7" rx="1.2" transform="rotate(315)"/>
-    </g>
-    <circle r="8.5"/>
-    <circle r="3.4" fill="#c2147e"/>
   </g>
 </svg>
