@@ -142,6 +142,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .fb-answer{color:var(--teal)}
 .fb-source{color:var(--warn)}
 .quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);gap:12px}
+.quiz-footer > .btn{margin-left:auto}
 .btn{background:var(--acc2);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;cursor:pointer;font-weight:500}
 .btn:hover{background:var(--acc)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
