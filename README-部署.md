@@ -76,3 +76,26 @@ Cloudflare 会自动重新部署，网址不变，iPad 打开即新版。
 ## 本地预览
 双击 `index.html` 即可在本机浏览器打开（file:// 模式下扫码按钮会提示需 https，其余功能正常）。
 或在本目录执行 `python -m http.server 8000`，浏览器访问 `http://localhost:8000`。
+
+---
+
+## 进度云同步（重要）
+
+### 为什么需要
+浏览器进度存在 `localStorage`，它**按域名隔离**。本站先后用过 workbuddy 临时链接、`pages.dev`、`jd.yiyoo.ccwu.cc`，每个域名各存一套空白记录；iPad「添加到主屏幕」又是独立存储。所以换域名/换设备看起来像"记录丢了"——**不是代码清空**。
+
+### 现在的做法
+- 前端每次保存进度，都会防抖 1.2s 后 `POST api/sync?k=...`，把整份进度存到 Cloudflare KV。
+- 打开页面时先本地渲染（秒开），再异步 `GET api/sync` 拉云端，用 `mergeProgress()` 合并：题记录 right/wrong/streak **取较大值**、卡片取并集、连续天数取大、日期取晚。
+- 顶栏 `☁ 已同步` / `☁ 仅本地` 指示状态。**云端不可用时静默降级**，照常本地刷题，恢复网络后自动补传。
+- "重置进度"会带 `epoch`（时间戳）清空云端，避免旧记录被合并回来。
+
+### 后端在哪
+- `functions/api/sync.js` —— Cloudflare Pages Function，随站点自动部署到 `https://jd.yiyoo.ccwu.cc/api/sync`（同域，无跨域、无需代理）。
+- KV namespace：`JIDIAN_PROGRESS`，id `75c134592fb5429fb84f40314b22b1c6`，绑定名 `PROGRESS`（已在 Pages 项目 production/preview 两个环境绑定）。
+- 同步码：`?k=jidian2027`（写在前端 `SYNC_URL` 与 Function 的 `TOKEN`，改要两边一起改）。
+
+### 以后要改
+- 改 KV 绑定：`wrangler.toml` 不能用于 Pages 项目绑定，必须走 API：
+  `PATCH /accounts/{id}/pages/projects/jidian-quiz`，body 里 `deployment_configs.<env>.kv_namespaces = {"PROGRESS":{"namespace_id":"..."}}`（是**对象映射**，不是数组）。
+- 手动读云端：`curl "https://jd.yiyoo.ccwu.cc/api/sync?k=jidian2027"`
