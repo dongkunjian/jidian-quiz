@@ -489,6 +489,7 @@ function renderQuestion(){
       ${starHtml}
       <span class="q-mastery ${lvCls}">${lvTxt}</span>
       <span class="muted">出处 ${esc(q.source)} · 累计 对${st.right}/错${st.wrong}</span>
+      <button class="fb-btn" onclick="openFeedback()" title="发现本题有错？点这里告诉我">✎ 我要纠错</button>
     </div>
     ${caseHtml}
     <div class="q-stem">${esc(q.stem)}</div>
@@ -537,6 +538,91 @@ function renderFooter(){
       f.innerHTML = `<button class="btn" id="btnSubmit" onclick="submitAnswer()" ${needSel?"disabled":""}>提交答案</button>`;
     }
   }
+}
+
+// ===== 题目纠错反馈 =====
+// 每道题右侧有"我要纠错"按钮，弹窗写清错误，提交到同域 /api/feedback（存 CF KV）。
+// 维护者开工时拉取全部待处理纠错，核教材后逐条更正题库。
+const FB_URL = "api/feedback?k=jidian2027";
+const FB_PENDING_KEY = "jidian_feedback_pending_v1";
+
+function fbPending(){ try { return JSON.parse(localStorage.getItem(FB_PENDING_KEY) || "[]"); } catch(e){ return []; } }
+function fbSavePending(arr){ try { localStorage.setItem(FB_PENDING_KEY, JSON.stringify(arr)); } catch(e){} }
+
+function openFeedback(){
+  const q = QUIZ.list[QUIZ.idx];
+  if (!q) return;
+  const secName = (sectionById(CUR.sectionId)||{}).sec ? sectionById(CUR.sectionId).sec.name : "";
+  const meta = $("#fbModalMeta");
+  if (meta) meta.textContent = `${CUR.sectionId} ${secName} · 第 ${QUIZ.idx+1} 题 · ${q.id}`;
+  const stemEl = $("#fbModalStem");
+  if (stemEl) stemEl.textContent = q.stem || "";
+  const input = $("#fbModalInput");
+  if (input) input.value = "";
+  const msg = $("#fbModalMsg");
+  if (msg){ msg.textContent = ""; msg.className = "fb-msg"; }
+  const m = $("#fbModal");
+  if (m) m.classList.remove("hidden");
+  setTimeout(()=>{ try { input && input.focus(); } catch(e){} }, 60);
+}
+
+function closeFeedback(){
+  const m = $("#fbModal");
+  if (m) m.classList.add("hidden");
+}
+
+async function submitFeedback(){
+  const q = QUIZ.list[QUIZ.idx];
+  if (!q) return;
+  const input = $("#fbModalInput"), msg = $("#fbModalMsg"), btn = $("#fbModalSubmit");
+  const note = ((input && input.value) || "").trim();
+  if (note.length < 2){
+    if (msg){ msg.textContent = "请把错误说清楚一点（至少 2 个字）"; msg.className = "fb-msg no"; }
+    return;
+  }
+  const payload = {
+    section: CUR.sectionId,
+    qid: q.id,
+    idx: QUIZ.idx + 1,
+    stem: q.stem || "",
+    source: q.source || "",
+    type: q.type || "",
+    note: note,
+    ts: Date.now(),
+    ua: (navigator.userAgent || "").slice(0, 160)
+  };
+  if (btn){ btn.disabled = true; btn.textContent = "提交中…"; }
+  let ok = false;
+  try {
+    const r = await fetch(FB_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), cache:"no-store" });
+    const j = await r.json();
+    ok = !!(j && j.ok);
+  } catch(e){ ok = false; }
+
+  if (ok){
+    if (msg){ msg.textContent = "✓ 已收到，我会核教材后更正，谢谢！"; msg.className = "fb-msg ok"; }
+    setTimeout(closeFeedback, 1100);
+  } else {
+    const arr = fbPending(); arr.push(payload); fbSavePending(arr);
+    if (msg){ msg.textContent = "网络异常，已暂存本机，联网后自动补传"; msg.className = "fb-msg no"; }
+    setTimeout(closeFeedback, 1600);
+  }
+  if (btn){ btn.disabled = false; btn.textContent = "提交"; }
+}
+
+// 联网后把本机暂存的纠错补传上去（静默，不打扰刷题）
+async function flushFeedbackPending(){
+  const arr = fbPending();
+  if (!arr.length) return;
+  const rest = [];
+  for (const p of arr){
+    try {
+      const r = await fetch(FB_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(p), cache:"no-store" });
+      const j = await r.json();
+      if (!(j && j.ok)) rest.push(p);
+    } catch(e){ rest.push(p); }
+  }
+  fbSavePending(rest);
 }
 
 // ===== 提交后把"下一题"按钮锚定回"提交答案"的屏幕位置 =====
@@ -897,3 +983,5 @@ showView("home");
 // 注意：syncReady 在 pullProgress 内部合并完成后才置 true，
 // 避免"拉取尚未完成就用本地空数据覆盖云端"。
 pullProgress();
+// 顺手把本机暂存的纠错补传上去（若之前提交时网络异常）
+flushFeedbackPending();
