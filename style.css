@@ -9,11 +9,15 @@
   --r:12px; --r2:9px;
   /* PWA/刘海屏安全区：顶栏据此下移，避免被时间/电池状态栏压住 */
   --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+  --safe-left:env(safe-area-inset-left, 0px);
+  --safe-right:env(safe-area-inset-right, 0px);
   --top-h:calc(62px + var(--safe-top));
 }
-/* iPad/手机等触控设备（添加到主屏幕的 PWA）：env() 在某些 iPadOS 返回偏小，
-   额外下移半个 logo 高（20px），确保 logo 与标题完全露出；桌面鼠标设备不受影响 */
-@media (pointer:coarse){
+/* 平板触控设备（≥600px，含 iPad 12.9）：iPadOS 的 env(safe-top) 在 PWA 下常返回偏小，
+   额外下移半个 logo 高（20px）确保 logo/标题露出。手机（<600px）的 env 值本身准确，不加，
+   否则顶栏会过度留白；桌面鼠标设备同样不受影响。 */
+@media (pointer:coarse) and (min-width:600px){
   :root{ --safe-top:calc(env(safe-area-inset-top, 0px) + 20px); }
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -22,7 +26,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .muted{color:var(--tx3);font-size:12px}
 
 /* topbar */
-.topbar{min-height:var(--top-h);height:auto;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:var(--safe-top) 24px 0;position:sticky;top:0;z-index:20}
+.topbar{min-height:var(--top-h);height:auto;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:var(--safe-top) calc(24px + var(--safe-right)) 0 calc(24px + var(--safe-left));position:sticky;top:0;z-index:20}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:0 1 auto}
 .brand-mark{width:40px;height:40px;border-radius:11px;object-fit:cover;flex:0 0 40px}
 .brand>div{min-width:0}
@@ -47,9 +51,9 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .more-menu button.danger:hover{background:var(--nobg);color:var(--no)}
 
 /* layout */
-.layout{display:flex;min-height:calc(100vh - var(--top-h))}
+.layout{display:flex;min-height:calc(100vh - var(--top-h));padding-bottom:var(--safe-bottom)}
 .sidebar{width:250px;flex:0 0 250px;background:var(--bg2);border-right:1px solid var(--line);padding:18px 12px;overflow-y:auto;max-height:calc(100vh - var(--top-h));position:sticky;top:var(--top-h)}
-.main{flex:1;padding:24px 32px;max-width:1000px;margin:0 auto;width:100%}
+.main{flex:1;padding:24px 32px;max-width:1000px;margin:0 auto;width:100%;padding-left:calc(32px + var(--safe-left));padding-right:calc(32px + var(--safe-right))}
 
 /* sidebar tree */
 .side-home,.side-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--tx2);font-size:13px;user-select:none;transition:.12s}
@@ -212,7 +216,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .stat-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .stat-num{font-size:26px;font-weight:600;color:var(--acc)}
 .stat-lbl{font-size:12px;color:var(--tx3);margin-top:2px}
-.stat-table{width:100%;border-collapse:collapse;background:var(--bg2);border-radius:var(--r);overflow:hidden}
+.stat-table{width:100%;border-collapse:collapse;background:var(--bg2);border-radius:var(--r);overflow:hidden;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
 .stat-table th,.stat-table td{padding:11px 14px;text-align:left;font-size:12.5px;border-bottom:1px solid var(--line)}
 .stat-table th{color:var(--tx3);font-weight:600;font-size:11px;letter-spacing:.3px}
 .stat-table tr:last-child td{border-bottom:none}
@@ -220,21 +224,92 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .stat-table .mini-bar{width:100%}
 
 /* toast */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg4);border:1px solid var(--line2);color:var(--tx);padding:12px 22px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast{position:fixed;bottom:calc(28px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg4);border:1px solid var(--line2);color:var(--tx);padding:12px 22px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:calc(100vw - 32px);text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ==================== 响应式适配 ====================
+   设备分档：手机竖屏(≤480) / 大屏手机·小平板(481~760) / iPad竖屏(761~1100) / 桌面(>1100)
+   iPhone：390×844 / 393×852 / 430×932（竖）· 844~932（横）
+   iPad 12.9：1024×1366（竖）· 1366×1024（横）
+====================================================== */
+
+/* ---- 手机 + 小平板（≤760）：隐藏侧栏，主区铺满 ---- */
 @media(max-width:760px){
   .sidebar{display:none}
-  .main{padding:18px 16px}
+  .main{padding:18px 16px;padding-left:calc(16px + var(--safe-left));padding-right:calc(16px + var(--safe-right))}
   .hero{flex-direction:column;align-items:flex-start;gap:18px}
   .hero-tips{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:16px;width:100%}
-  .topbar{padding:var(--safe-top) 14px 0;gap:8px}
+  .topbar{gap:8px;padding-left:calc(14px + var(--safe-left));padding-right:calc(14px + var(--safe-right))}
   .brand-sub{display:none}
   .brand-title{font-size:14px}
   /* 窄屏：顶栏按钮只留图标，文字收起，避免挤压换行 */
   .tb-btn span{display:none}
   .tb-btn{padding:8px 10px}
   .sync-dot{display:none}
+  /* 弹窗：贴底留安全区、限高可滚动 */
+  .modal-mask{padding:calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom))}
+  .modal-box{max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 24px)}
+  .modal-head{padding:14px 16px}
+  .modal-body{padding:14px 16px}
+  .modal-foot{padding:12px 16px calc(12px + var(--safe-bottom))}
+  .backup-text{height:130px}
+  /* 答题格子墙：窄屏缩小格子、减少间距，一屏多排几个 */
+  .nav-grid{grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:6px}
+  .nav-cell{font-size:12px}
+}
+
+/* ---- 手机竖屏（≤480）：进一步压紧间距、题干/选项适配小屏 ---- */
+@media(max-width:480px){
+  .main{padding:14px 12px;padding-left:calc(12px + var(--safe-left));padding-right:calc(12px + var(--safe-right))}
+  .brand-title{font-size:13px}
+  .brand-mark{width:36px;height:36px;flex-basis:36px}
+  .streak-badge{padding:4px 8px}
+  .crumbs{font-size:11px;margin-bottom:12px}
+  .quiz-wrap{padding:16px 14px}
+  .q-stem{font-size:18px;line-height:1.7}
+  .opt{padding:11px 12px;font-size:16px;gap:10px}
+  .opt .key{width:22px;height:22px;flex-basis:22px;font-size:13px}
+  .hero{padding:18px 16px;gap:16px}
+  .ring{width:76px;height:76px;font-size:17px}
+  .section-grid{grid-template-columns:1fr;gap:10px}
+  .sec-card .sc-name{min-height:0}
+  .nav-panel{padding:14px 12px}
+  .nav-legend{gap:8px 12px}
+  .legend-item{font-size:11px}
+  .nav-grid{grid-template-columns:repeat(auto-fill,minmax(32px,1fr));gap:5px}
+  .nav-cell{font-size:11px;border-radius:6px}
+  .view-head h2{font-size:19px}
+  .modes{gap:5px}
+  .mode-btn{padding:6px 10px;font-size:13px}
+  .case-bg{padding:10px 12px;font-size:14px}
+  .rule-tip{font-size:11.5px}
+  .feedback{padding:14px}
+  #qrcode,.qr-local{width:200px;height:200px}
+  .qr-wrap{padding:12px}
+  /* 反馈区就地纠错按钮：小屏左对齐更易点 */
+  .fb-feedback-row{text-align:left}
+}
+
+/* ---- 超窄屏（≤360，如 iPhone SE）：隐藏连续天数徽章，给标题腾地方 ---- */
+@media(max-width:360px){
+  .streak-badge{display:none}
+}
+
+/* ---- iPad 竖屏（761~1100）：侧栏收窄、主区加宽、隐藏副标题 ---- */
+@media(min-width:761px) and (max-width:1100px){
+  .sidebar{width:212px;flex-basis:212px}
+  .brand-sub{display:none}
+  .main{padding:20px 22px;padding-left:calc(22px + var(--safe-left));padding-right:calc(22px + var(--safe-right))}
+  .hero{padding:20px 22px}
+  .section-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+}
+
+/* ---- 横屏矮屏（手机/iPad 横屏，高度≤600）：压缩纵向间距 ---- */
+@media(max-height:600px) and (orientation:landscape){
+  .hero{padding:14px 18px}
+  .ring{width:66px;height:66px;font-size:16px}
+  .quiz-card{min-height:160px}
+  .done-panel{padding:20px}
 }
 
 /* 进度备份弹窗 */
