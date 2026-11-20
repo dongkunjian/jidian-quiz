@@ -180,6 +180,15 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI","
 .nav-panel{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-top:18px}
 .nav-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .nav-title{font-size:15px;font-weight:600}
+/* 答题总表「收起/展开」按钮：iOS Safari 会给 button 套浅灰底系统蓝字，
+   这里显式重置为暗色胶囊，与面板配色一致（-webkit-appearance 去掉原生外观） */
+#navToggle,#btnToggleRemembered{
+  -webkit-appearance:none;appearance:none;
+  background:var(--bg3);border:1px solid var(--line2);color:var(--tx2);
+  border-radius:9px;padding:7px 14px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:.15s;white-space:nowrap;line-height:1;
+}
+#navToggle:hover,#btnToggleRemembered:hover{border-color:var(--acc);color:var(--acc);background:var(--bg4)}
 .nav-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2)}
 .legend-item b{color:var(--tx);font-weight:600;margin-left:1px}
